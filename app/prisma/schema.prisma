@@ -1,0 +1,139 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(uuid()) @db.Uuid
+  clerkId   String   @unique @map("clerk_id")
+  email     String   @unique
+  name      String?
+  imageUrl  String?  @map("image_url")
+  role      String   @default("USER")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  workspaces Workspace[]
+
+  @@map("users")
+}
+
+model Workspace {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  name      String
+  industry  String?
+  llmApiKey String?  @map("llm_api_key")
+  llmProvider String? @default("openai") @map("llm_provider")
+  hfApiKey  String?  @map("hf_api_key")
+  sentimentProvider String? @default("huggingface") @map("sentiment_provider")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user           User            @relation(fields: [userId], references: [id])
+  reviews        Review[]
+  complaints     Complaint[]
+  insights       Insight[]
+  analyticsCache AnalyticsCache?
+  fileUploads    FileUpload[]
+
+  @@map("workspaces")
+}
+
+model Review {
+  id         String    @id @default(uuid()) @db.Uuid
+  workspaceId String   @map("workspace_id") @db.Uuid
+  reviewText String    @map("review_text")
+  source     String    @default("manual") // csv | manual | api
+  rating     Int?
+  reviewDate DateTime? @map("review_date")
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  workspace  Workspace   @relation(fields: [workspaceId], references: [id])
+  aiAnalysis AiAnalysis?
+  complaint  Complaint?
+
+  @@index([workspaceId])
+  @@index([reviewDate])
+  @@map("reviews")
+}
+
+model AiAnalysis {
+  id          String   @id @default(uuid()) @db.Uuid
+  reviewId    String   @unique @map("review_id") @db.Uuid
+  sentiment   String
+  confidence  Float
+  category    String
+  processedAt DateTime @default(now()) @map("processed_at")
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@index([sentiment])
+  @@map("ai_analysis")
+}
+
+model Complaint {
+  id          String    @id @default(uuid()) @db.Uuid
+  reviewId    String    @unique @map("review_id") @db.Uuid
+  workspaceId String    @map("workspace_id") @db.Uuid
+  status      String    @default("OPEN") // OPEN | IN_PROGRESS | RESOLVED
+  severity    String    @default("LOW")
+  actionNote  String?   @map("action_note")
+  assignedTo  String?   @map("assigned_to")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  resolvedAt  DateTime? @map("resolved_at")
+
+  review    Review    @relation(fields: [reviewId], references: [id])
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@index([status])
+  @@map("complaints")
+}
+
+model Insight {
+  id                 String   @id @default(uuid()) @db.Uuid
+  workspaceId        String   @map("workspace_id") @db.Uuid
+  summary            String
+  keyIssues          String[] @map("key_issues")
+  positiveHighlights String[] @map("positive_highlights")
+  recommendations    String[] @map("recommendations")
+  generatedAt        DateTime @default(now()) @map("generated_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@index([workspaceId])
+  @@map("insights")
+}
+
+model AnalyticsCache {
+  id              String   @id @default(uuid()) @db.Uuid
+  workspaceId     String   @unique @map("workspace_id") @db.Uuid
+  totalReviews    Int      @default(0) @map("total_reviews")
+  positivePercent Float    @default(0) @map("positive_percent")
+  negativePercent Float    @default(0) @map("negative_percent")
+  neutralPercent  Float    @default(0) @map("neutral_percent")
+  avgConfidence   Float    @default(0) @map("avg_confidence")
+  topCategories   Json?    @map("top_categories")
+  trendData       Json?    @map("trend_data")
+  updatedAt       DateTime @default(now()) @map("updated_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@map("analytics_cache")
+}
+
+model FileUpload {
+  id           String   @id @default(uuid()) @db.Uuid
+  workspaceId  String   @map("workspace_id") @db.Uuid
+  fileName     String?  @map("file_name")
+  fileUrl      String?  @map("file_url")
+  uploadStatus String   @default("PENDING") @map("upload_status")
+  totalReviews Int?     @map("total_reviews")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@map("file_uploads")
+}
