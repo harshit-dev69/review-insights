@@ -7,7 +7,7 @@
     "build": "prisma generate --schema=prisma/schema.prisma && next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate --schema=prisma/schema.prisma"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.3.4",
@@ -19,7 +19,7 @@
     "date-fns": "^4.1.0",
     "dotenv": "^17.4.2",
     "framer-motion": "^12.38.0",
-    "lucide-react": "^1.16.0",
+    "lucide-react": "^0.469.0",
     "next": "16.2.6",
     "openai": "^6.38.0",
     "papaparse": "^5.5.3",
