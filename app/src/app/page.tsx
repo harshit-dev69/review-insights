@@ -20,7 +20,7 @@ export default function LandingPage() {
         </div>
         <h1>Understand Your Customers Like Never Before</h1>
         <p>
-          Upload customer reviews and let AI analyze sentiment, detect complaints, 
+          Upload customer reviews and let AI analyze sentiment, detect complaints,
           identify trends, and generate actionable business insights — all in real time.
         </p>
         <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
@@ -35,10 +35,10 @@ export default function LandingPage() {
 
       <section style={{ background: "var(--color-muted)", padding: "48px 32px", textAlign: "center" }}>
         <p style={{ fontSize: 13, fontWeight: 600, color: "var(--color-muted-foreground)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>
-          Trusted by businesses worldwide
+          Created by - Harshit · Ranganatha
         </p>
         <p style={{ fontSize: 14, color: "var(--color-muted-foreground)" }}>
-          Restaurants · Cafés · Hotels · Salons · Retail · Support Teams
+          1DA25AI014 · 1DA25AI039
         </p>
       </section>
 
